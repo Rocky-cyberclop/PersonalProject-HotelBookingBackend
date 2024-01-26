@@ -1,0 +1,1 @@
+This is the backend of the hotel room booking system, it can operate seperately with the frontend --Rocky
