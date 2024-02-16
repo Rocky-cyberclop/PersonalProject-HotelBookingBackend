@@ -23,11 +23,11 @@ public class AuthenticateFilter extends AbstractGatewayFilterFactory<Authenticat
     }
 
     @Override
-    public GatewayFilter apply(Config config){
+    public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
             ServerHttpRequest user = null;
-            if(routeValidator.isSecured.test(exchange.getRequest())){
-                if(!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)){
+            if (routeValidator.isSecured.test(exchange.getRequest())) {
+                if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
                     throw new RuntimeException("Missing authrization header");
                 }
 
@@ -49,6 +49,10 @@ public class AuthenticateFilter extends AbstractGatewayFilterFactory<Authenticat
                     throw new RuntimeException("un authorized access to application");
                 }
             }
+//            else if (routeValidator){
+//
+//
+//            }
             return chain.filter(exchange.mutate().request(user).build());
         });
     }
