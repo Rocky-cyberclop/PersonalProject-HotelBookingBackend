@@ -4,10 +4,14 @@ import com.rocky.gatewayservice.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 @Component
 public class AuthenticateFilter extends AbstractGatewayFilterFactory<AuthenticateFilter.Config> {
@@ -28,7 +32,8 @@ public class AuthenticateFilter extends AbstractGatewayFilterFactory<Authenticat
             ServerHttpRequest user = null;
             if (routeValidator.isSecured.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                    throw new RuntimeException("Missing authrization header");
+                    System.out.println("Missing authorization header");
+                    return handleErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Missing authorization header");
                 }
 
                 String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
@@ -46,15 +51,20 @@ public class AuthenticateFilter extends AbstractGatewayFilterFactory<Authenticat
 
                 } catch (Exception e) {
                     System.out.println("invalid access...!");
-                    throw new RuntimeException("un authorized access to application");
+                    System.out.println("un authorized access to application");
+                    return handleErrorResponse(exchange, HttpStatus.UNAUTHORIZED, "un authorized access to application");
                 }
             }
-//            else if (routeValidator){
-//
-//
-//            }
+
             return chain.filter(exchange.mutate().request(user).build());
         });
+    }
+
+    private Mono<Void> handleErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {
+        exchange.getResponse().setStatusCode(status);
+        exchange.getResponse().getHeaders().add(HttpHeaders.CONTENT_TYPE, "text/plain");
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(message.getBytes());
+        return exchange.getResponse().writeWith(Mono.just(buffer));
     }
 
     public static class Config {

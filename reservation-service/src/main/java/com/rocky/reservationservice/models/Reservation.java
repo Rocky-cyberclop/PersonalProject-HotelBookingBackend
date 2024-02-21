@@ -1,5 +1,6 @@
 package com.rocky.reservationservice.models;
 
+import com.rocky.reservationservice.dtos.RoomWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,4 +23,7 @@ public class Reservation {
     private String guestToken;
     private List<Guest> guests;
     private Payment payment;
+    private LocalDate createdAt;
+    private List<RoomWrapper> rooms;
+    private String customerEmail;
 }

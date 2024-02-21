@@ -29,6 +29,11 @@ public class IdentityController {
         return new ResponseEntity<>(identityService.login(loginRequest), HttpStatus.UNAUTHORIZED);
     }
 
+    @GetMapping("generateToken")
+    public ResponseEntity<String> generateRandomToken(){
+        return new ResponseEntity<>(identityService.generateRandomToken(), HttpStatus.OK);
+    }
+
     @GetMapping("hi")
     public ResponseEntity<String> sayHi(){
         return new ResponseEntity<>("Hello", HttpStatus.OK);

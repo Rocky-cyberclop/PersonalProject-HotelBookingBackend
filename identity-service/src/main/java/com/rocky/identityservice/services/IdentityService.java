@@ -8,4 +8,7 @@ public interface IdentityService {
     ResponseEntity<RegisterRequest> register(RegisterRequest registerRequest);
 
     String login(LoginRequest loginRequest);
+
+    String generateRandomToken();
+
 }

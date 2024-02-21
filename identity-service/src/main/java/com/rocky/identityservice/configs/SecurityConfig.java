@@ -24,7 +24,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChainApis(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(req ->
-                        req.requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        req.requestMatchers("/api/auth/register", "/api/auth/login",
+                                        "/api/auth/generateToken").permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )

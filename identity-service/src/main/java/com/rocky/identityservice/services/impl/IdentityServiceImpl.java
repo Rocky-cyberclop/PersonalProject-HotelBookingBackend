@@ -2,6 +2,7 @@ package com.rocky.identityservice.services.impl;
 
 import com.rocky.identityservice.dtos.LoginRequest;
 import com.rocky.identityservice.dtos.RegisterRequest;
+import com.rocky.identityservice.helpers.Helper;
 import com.rocky.identityservice.models.Customer;
 import com.rocky.identityservice.repositories.CustomerRepository;
 import com.rocky.identityservice.services.IdentityService;
@@ -9,6 +10,8 @@ import com.rocky.identityservice.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,5 +46,12 @@ public class IdentityServiceImpl implements IdentityService {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         if(!bCryptPasswordEncoder.matches(loginRequest.getPassword(), customer.getPassword()))return "Pass not match";
         return jwtService.generateToken(customer);
+    }
+
+    @Override
+    public String generateRandomToken() {
+        UserDetails userDetails = new User(Helper.randomString(7),
+                "Not a passwrod", CustomUserDetailServiceImpl.getUserAuthorities());
+        return jwtService.generateToken(userDetails);
     }
 }

@@ -12,6 +12,8 @@ public class RouteValidator {
     public static final List<String> whiteApi = List.of(
             "/api/auth/register",
             "/api/auth/login",
+            "/api/reservation",
+            "/api/room/assets/images",
             "eureka"
     );
 

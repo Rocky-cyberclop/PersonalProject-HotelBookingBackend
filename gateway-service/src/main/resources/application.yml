@@ -18,11 +18,31 @@ spring:
           uri: lb://RESERVATION-SERVICE
           predicates:
             - Path=/api/reservation/**
+          filters:
+            - AuthenticateFilter
+
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/ws/**
 
         - id: room-service
           uri: lb://ROOM-SERVICE
           predicates:
             - Path=/api/room/**
+          filters:
+            - AuthenticateFilter
+
+      globalcors:
+        corsConfigurations:
+          '[/api/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
 
   application:
     name: GATEWAY-SERVICE
@@ -30,4 +50,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone : http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
