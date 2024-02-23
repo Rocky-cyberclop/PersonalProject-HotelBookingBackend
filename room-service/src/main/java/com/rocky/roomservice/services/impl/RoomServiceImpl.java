@@ -1,5 +1,6 @@
 package com.rocky.roomservice.services.impl;
 
+import com.rocky.roomservice.dtos.RoomWrapper;
 import com.rocky.roomservice.models.Picture;
 import com.rocky.roomservice.models.Room;
 import com.rocky.roomservice.repositories.RoomRepository;
@@ -36,8 +37,10 @@ public class RoomServiceImpl implements RoomService {
             picture = new Picture();
             picture.setUrl("doubles1.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("doubles2.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("doubles3.jpg");
             pictures.add(picture);
             room.setPictures(pictures);
@@ -51,8 +54,10 @@ public class RoomServiceImpl implements RoomService {
             picture = new Picture();
             picture.setUrl("double1.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("double2.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("double3.jpg");
             pictures.add(picture);
             room.setPictures(pictures);
@@ -66,6 +71,7 @@ public class RoomServiceImpl implements RoomService {
             picture = new Picture();
             picture.setUrl("single1.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("single2.jpg");
             pictures.add(picture);
             room.setPictures(pictures);
@@ -79,6 +85,7 @@ public class RoomServiceImpl implements RoomService {
             picture = new Picture();
             picture.setUrl("single1.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("single2.jpg");
             pictures.add(picture);
             room.setPictures(pictures);
@@ -92,6 +99,7 @@ public class RoomServiceImpl implements RoomService {
             picture = new Picture();
             picture.setUrl("single1.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("single2.jpg");
             pictures.add(picture);
             room.setPictures(pictures);
@@ -105,6 +113,7 @@ public class RoomServiceImpl implements RoomService {
             picture = new Picture();
             picture.setUrl("single1.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("single2.jpg");
             pictures.add(picture);
             room.setPictures(pictures);
@@ -118,8 +127,10 @@ public class RoomServiceImpl implements RoomService {
             picture = new Picture();
             picture.setUrl("double1.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("double2.jpg");
             pictures.add(picture);
+            picture = new Picture();
             picture.setUrl("double3.jpg");
             pictures.add(picture);
             room.setPictures(pictures);
@@ -148,5 +159,43 @@ public class RoomServiceImpl implements RoomService {
         rooms.add(room);
 
         roomRepository.saveAll(rooms);
+    }
+
+    @Override
+    public List<RoomWrapper> getRoomsByFloor(Integer floor) {
+        List<RoomWrapper> roomWrappers = new ArrayList<>();
+        List<Room> rooms = roomRepository.findRoomByNumberBetween(floor*100, (floor*100)+50);
+        for(Room room : rooms){
+            RoomWrapper roomWrapper = new RoomWrapper();
+            roomWrapper.setTitle("");
+            roomWrapper.setNumber(room.getNumber());
+            List<String> images = new ArrayList<>();
+            for(Picture picture : room.getPictures()){
+                images.add(picture.getUrl());
+            }
+            roomWrapper.setImages(images);
+            roomWrapper.setBooked(false);
+            roomWrapper.setPrice(room.getPrice());
+            StringBuilder description = new StringBuilder("This room contain:\n");
+            for(String utl : room.getRoomType().getUtilities()){
+                description.append(utl).append("\n");
+            }
+            roomWrapper.setDescription(description.toString());
+            roomWrapper.setCapacity(room.getRoomType().getCapacity());
+            roomWrappers.add(roomWrapper);
+        }
+        return roomWrappers;
+    }
+
+    @Override
+    public RoomWrapper getByNumber(Integer number) {
+        RoomWrapper roomWrapper = new RoomWrapper();
+        if(!roomRepository.findRoomByNumber(number).isEmpty()) {
+            Room room = roomRepository.findRoomByNumber(number).get(0);
+            roomWrapper.setNumber(room.getNumber());
+            roomWrapper.setPrice(room.getPrice());
+            roomWrapper.setCapacity(room.getRoomType().getCapacity());
+        }
+        return roomWrapper;
     }
 }

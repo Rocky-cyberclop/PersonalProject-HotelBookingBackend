@@ -13,8 +13,9 @@ import java.util.List;
 public class RoomWrapper implements Serializable {
     private String title;
     private Integer number;
-    private List<PictureWrapper> pictures;
+    private List<String> images;
     private Long price;
     private String description;
     private Boolean booked;
+    private Integer capacity;
 }

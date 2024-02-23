@@ -1,4 +1,4 @@
-package com.rocky.reservationservice.config;
+package com.rocky.notificationservice.configs;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
@@ -8,18 +8,11 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
 @EnableKafka
-public class KafkaConfigure {
+public class KafkaConfig {
     @Bean
-    public NewTopic seatTopic(){
+    public NewTopic setChoosingDone(){
         return TopicBuilder
-                .name("roomTopic")
-                .build();
-    }
-
-    @Bean
-    public NewTopic cleanReserveTopic(){
-        return TopicBuilder
-                .name("cleanTopic")
+                .name("doneChooseRoomTopic")
                 .build();
     }
 }

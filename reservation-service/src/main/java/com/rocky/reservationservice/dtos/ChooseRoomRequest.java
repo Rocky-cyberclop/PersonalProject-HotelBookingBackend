@@ -1,4 +1,4 @@
-package com.rocky.roomservice.dtos;
+package com.rocky.reservationservice.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PictureWrapper {
-    private String url;
+public class ChooseRoomRequest {
+    private String from;
+    private String to;
 }

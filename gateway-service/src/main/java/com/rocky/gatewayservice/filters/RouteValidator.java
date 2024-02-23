@@ -13,6 +13,7 @@ public class RouteValidator {
             "/api/auth/register",
             "/api/auth/login",
             "/api/reservation",
+            "/api/room",
             "/api/room/assets/images",
             "eureka"
     );

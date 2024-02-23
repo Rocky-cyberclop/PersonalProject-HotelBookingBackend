@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -23,7 +24,7 @@ public class Reservation {
     private String guestToken;
     private List<Guest> guests;
     private Payment payment;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private List<RoomWrapper> rooms;
     private String customerEmail;
 }

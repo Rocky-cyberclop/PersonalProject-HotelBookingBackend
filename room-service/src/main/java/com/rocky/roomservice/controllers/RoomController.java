@@ -1,5 +1,6 @@
 package com.rocky.roomservice.controllers;
 
+import com.rocky.roomservice.dtos.RoomWrapper;
 import com.rocky.roomservice.services.RoomService;
 import com.rocky.roomservice.services.RoomTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/room")
@@ -52,5 +54,15 @@ public class RoomController {
         }
 
         return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("floor/{number}")
+    public ResponseEntity<List<RoomWrapper>> getRoomInFloor(@PathVariable("number") Integer floor){
+        return new ResponseEntity<>(roomService.getRoomsByFloor(floor), HttpStatus.OK);
+    }
+
+    @GetMapping("{number}")
+    public ResponseEntity<RoomWrapper> getRoom(@PathVariable Integer number){
+        return new ResponseEntity<>(roomService.getByNumber(number), HttpStatus.OK);
     }
 }

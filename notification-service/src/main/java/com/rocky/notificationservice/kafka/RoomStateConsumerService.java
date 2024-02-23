@@ -16,7 +16,6 @@ public class RoomStateConsumerService {
 
     @KafkaListener(groupId = "notificationGroup", topics = "roomTopic")
     public void listenSeatTopic(RoomState roomState) {
-        System.out.println(roomState);
         simpMessagingTemplate.convertAndSend("/topic/room-state", roomState);
     }
 }
