@@ -22,4 +22,11 @@ public class KafkaConfigure {
                 .name("cleanTopic")
                 .build();
     }
+
+    @Bean
+    public NewTopic sendMailTopic(){
+        return TopicBuilder
+                .name("sendMailTopic")
+                .build();
+    }
 }

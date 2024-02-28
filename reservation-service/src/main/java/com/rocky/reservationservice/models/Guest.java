@@ -14,12 +14,7 @@ import org.springframework.data.annotation.Id;
 public class Guest {
     @Id
     private String _id;
-    @NotBlank(message = "Name can not be blank")
     private String name;
-    @Email(message = "Email is not valid")
-    @NotBlank(message = "Email can not be blank")
     private String email;
-    @Pattern(regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "Phone number is not valid")
-    @NotBlank(message = "Phone can not be blank")
     private String phone;
 }

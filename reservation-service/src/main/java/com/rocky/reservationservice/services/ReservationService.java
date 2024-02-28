@@ -1,8 +1,11 @@
 package com.rocky.reservationservice.services;
 
+import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
 import com.rocky.reservationservice.dtos.RoomState;
+import com.rocky.reservationservice.models.Guest;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,5 +20,11 @@ public interface ReservationService {
 
     void doneChooseRoom(String guest);
 
-    String findByGuest(String guest);
+    String handleDoneChoosingRoom(DoneChooseRoomRequest doneChooseRoomRequest);
+
+    Map<String, String> getInfoForPayment(String id);
+
+    String bindGuest(String id, List<Guest> guests);
+
+    List<Guest> getGuests(String id);
 }

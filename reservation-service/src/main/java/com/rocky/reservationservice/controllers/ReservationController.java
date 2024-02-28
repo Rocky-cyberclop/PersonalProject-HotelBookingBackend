@@ -2,14 +2,18 @@ package com.rocky.reservationservice.controllers;
 
 import com.rocky.reservationservice.dtos.BookedRoomsRequest;
 import com.rocky.reservationservice.dtos.ChooseRoomRequest;
+import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
 import com.rocky.reservationservice.dtos.RoomState;
 import com.rocky.reservationservice.kafka.ReservationProducerService;
+import com.rocky.reservationservice.models.Guest;
 import com.rocky.reservationservice.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -20,6 +24,21 @@ public class ReservationController {
 
     @Autowired
     private ReservationProducerService reservationProducerService;
+
+    @GetMapping("{id}")
+    public ResponseEntity<Map<String, String>> getInfoForPayment(@PathVariable String id){
+        return new ResponseEntity<>(reservationService.getInfoForPayment(id),HttpStatus.OK);
+    }
+
+    @GetMapping("guests/{id}")
+    public ResponseEntity<List<Guest>> bindGuest(@PathVariable String id){
+        return new ResponseEntity<>(reservationService.getGuests(id),HttpStatus.OK);
+    }
+
+    @PostMapping("{id}")
+    public ResponseEntity<String> bindGuests(@PathVariable String id, @RequestBody List<Guest> guests){
+        return new ResponseEntity<>(reservationService.bindGuest(id, guests),HttpStatus.OK);
+    }
 
     @GetMapping("doClean")
     public ResponseEntity<String> doCleanReservation() {
@@ -46,7 +65,7 @@ public class ReservationController {
     }
 
     @PostMapping("doneChooseRoom")
-    public ResponseEntity<String> doneChooseRooms(@RequestBody String guest) {
-        return new ResponseEntity<>(reservationService.findByGuest(guest), HttpStatus.OK);
+    public ResponseEntity<String> doneChooseRooms(@RequestBody DoneChooseRoomRequest doneChooseRoomRequest) {
+        return new ResponseEntity<>(reservationService.handleDoneChoosingRoom(doneChooseRoomRequest), HttpStatus.OK);
     }
 }

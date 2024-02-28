@@ -4,6 +4,8 @@ import com.rocky.identityservice.dtos.LoginRequest;
 import com.rocky.identityservice.dtos.RegisterRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
+
 public interface IdentityService {
     ResponseEntity<RegisterRequest> register(RegisterRequest registerRequest);
 
@@ -11,4 +13,5 @@ public interface IdentityService {
 
     String generateRandomToken();
 
+    void sendMailCompleteReserve(Map<String, String> toGuest);
 }

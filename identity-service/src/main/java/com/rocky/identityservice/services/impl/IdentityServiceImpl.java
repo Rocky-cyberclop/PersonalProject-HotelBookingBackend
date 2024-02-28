@@ -5,6 +5,7 @@ import com.rocky.identityservice.dtos.RegisterRequest;
 import com.rocky.identityservice.helpers.Helper;
 import com.rocky.identityservice.models.Customer;
 import com.rocky.identityservice.repositories.CustomerRepository;
+import com.rocky.identityservice.services.EmailService;
 import com.rocky.identityservice.services.IdentityService;
 import com.rocky.identityservice.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class IdentityServiceImpl implements IdentityService {
     @Autowired
@@ -22,6 +25,9 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public ResponseEntity<RegisterRequest> register(RegisterRequest registerRequest) {
@@ -41,10 +47,10 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public String login(LoginRequest loginRequest) {
-        if(customerRepository.findByEmail(loginRequest.getEmail()).isEmpty())return "No email found";
+        if (customerRepository.findByEmail(loginRequest.getEmail()).isEmpty()) return "No email found";
         Customer customer = customerRepository.findByEmail(loginRequest.getEmail()).get(0);
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        if(!bCryptPasswordEncoder.matches(loginRequest.getPassword(), customer.getPassword()))return "Pass not match";
+        if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) return "Pass not match";
         return jwtService.generateToken(customer);
     }
 
@@ -53,5 +59,16 @@ public class IdentityServiceImpl implements IdentityService {
         UserDetails userDetails = new User(Helper.randomString(7),
                 "Not a passwrod", CustomUserDetailServiceImpl.getUserAuthorities());
         return jwtService.generateToken(userDetails);
+    }
+
+    @Override
+    public void sendMailCompleteReserve(Map<String, String> toGuest) {
+        String subject = "This is your reservation code:" + toGuest.get("id");
+        subject += "\nIf you haven't finish your reservation yet";
+        subject += "\nOr just examine your inrfomation";
+        subject += "\nYou can complete your reservation by http://localhost:3000/findReservation";
+        subject += "\nAnd fill out with the code above";
+        subject += "\nThank for your grateful to us!";
+        emailService.sendEmail(toGuest.get("email"), "Confirm your resercation", subject);
     }
 }

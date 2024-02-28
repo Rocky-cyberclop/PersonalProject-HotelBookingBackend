@@ -12,7 +12,7 @@ import java.util.List;
 public interface ReservationRepository extends MongoRepository<Reservation, String> {
     List<Reservation> findReservationByPayment(Payment payment);
 
-    List<Reservation> findReservationByDateGoGreaterThanAndGuestTokenNot(LocalDate from, String guest);
+    List<Reservation> findReservationByDateGoGreaterThanEqualAndGuestTokenNot(LocalDate from, String guest);
 
     List<Reservation> findReservationByGuestToken(String guest);
 }

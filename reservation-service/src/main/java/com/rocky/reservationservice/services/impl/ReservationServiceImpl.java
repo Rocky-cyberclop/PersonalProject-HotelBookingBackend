@@ -1,11 +1,13 @@
 package com.rocky.reservationservice.services.impl;
 
+import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
 import com.rocky.reservationservice.dtos.RoomState;
 import com.rocky.reservationservice.dtos.RoomWrapper;
 import com.rocky.reservationservice.enums.RoomChosen;
 import com.rocky.reservationservice.feigns.IdentityFeign;
 import com.rocky.reservationservice.feigns.RoomFeign;
 import com.rocky.reservationservice.kafka.ReservationProducerService;
+import com.rocky.reservationservice.models.Guest;
 import com.rocky.reservationservice.models.Payment;
 import com.rocky.reservationservice.models.Reservation;
 import com.rocky.reservationservice.repositories.ReservationRepository;
@@ -14,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -70,9 +70,9 @@ public class ReservationServiceImpl implements ReservationService {
         LocalDate come = LocalDate.parse(from, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
         LocalDate go = LocalDate.parse(to, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
         Set<Integer> roomsBooked = new HashSet<>();
-        List<Reservation> reservations = reservationRepository.findReservationByDateGoGreaterThanAndGuestTokenNot(come, guest);
+        List<Reservation> reservations = reservationRepository.findReservationByDateGoGreaterThanEqualAndGuestTokenNot(come, guest);
         for (Reservation reservation : reservations) {
-            if (go.isAfter(reservation.getDateCome()) && (reservation.getRooms() != null)) {
+            if ((go.isAfter(reservation.getDateCome()) || go.isEqual(reservation.getDateCome())) && (reservation.getRooms() != null)) {
                 for (RoomWrapper roomWrapper : reservation.getRooms()) {
                     roomsBooked.add(roomWrapper.getNumber());
                 }
@@ -93,6 +93,8 @@ public class ReservationServiceImpl implements ReservationService {
             reservation.setCustomerEmail("chossing@gmail.com");
             reservation.setGuestToken(roomState.getGuest());
             reservation.setCreatedAt(LocalDateTime.now());
+            reservation.setTotalDate((int) ChronoUnit.DAYS.between(reservation.getDateCome(),
+                    reservation.getDateGo()));
         }
         RoomWrapper roomWrapperFromFeign = Objects.requireNonNull(roomFeign.getRoom(roomState.getRoom()).getBody());
         if (roomState.getType().equals(RoomChosen.RESERVE)) {
@@ -114,8 +116,10 @@ public class ReservationServiceImpl implements ReservationService {
                 if (reservation.getRooms() != null && !reservation.getRooms().isEmpty()) {
                     for (RoomWrapper roomWrapper : reservation.getRooms()) {
                         RoomState roomState = new RoomState();
-                        roomState.setFrom(reservation.getDateCome().toString());
-                        roomState.setTo(reservation.getDateGo().toString());
+                        roomState.setFrom(reservation.getDateCome().atTime(LocalTime.of(17, 0))
+                                .atZone(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX")));
+                        roomState.setTo(reservation.getDateGo().atTime(LocalTime.of(17, 0))
+                                .atZone(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX")));
                         roomState.setGuest("notanyguest");
                         roomState.setRoom(roomWrapper.getNumber());
                         roomState.setType(RoomChosen.UNRESERVED);
@@ -128,15 +132,85 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public String findByGuest(String guest) {
-        if (reservationRepository.findReservationByGuestToken(guest) != null
-                && !reservationRepository.findReservationByGuestToken(guest).isEmpty()){
-            Reservation reservation = reservationRepository.findReservationByGuestToken(guest).get(0);
+    public String handleDoneChoosingRoom(DoneChooseRoomRequest doneChooseRoomRequest) {
+        if (reservationRepository.findReservationByGuestToken(doneChooseRoomRequest.getGuest()) != null
+                && !reservationRepository.findReservationByGuestToken(doneChooseRoomRequest.getGuest()).isEmpty()) {
+            Reservation reservation = reservationRepository
+                    .findReservationByGuestToken(doneChooseRoomRequest.getGuest()).get(0);
             reservation.setGuestToken(null);
+            reservation.setGuests(new ArrayList<>());
+            for (int i = 0; i < doneChooseRoomRequest.getNumberOfPeople(); i++) {
+                Guest guest = new Guest();
+                guest.setName("");
+                guest.setEmail("");
+                guest.setPhone("");
+                reservation.getGuests().add(guest);
+            }
             reservationRepository.save(reservation);
             return reservation.get_id();
         }
         return null;
+    }
+
+    @Override
+    public Map<String, String> getInfoForPayment(String id) {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+        if (reservation.isEmpty()) return null;
+        Map<String, String> result = new HashMap<>();
+        result.put("come", reservation.get().getDateCome().toString());
+        result.put("go", reservation.get().getDateGo().toString());
+        result.put("totalDays", reservation.get().getTotalDate().toString());
+        int numberOfGuest = 0;
+        for (Guest guest : reservation.get().getGuests()) {
+            numberOfGuest++;
+        }
+        result.put("id", id);
+        result.put("adults", Integer.toString(numberOfGuest));
+        StringBuilder rooms = new StringBuilder("[");
+        Long price = 0L;
+        for (RoomWrapper roomWrapper : reservation.get().getRooms()) {
+            price += roomWrapper.getPrice();
+            rooms.append(roomWrapper.getNumber().toString()).append(", ");
+        }
+        rooms.append("]");
+        result.put("rooms", rooms.toString());
+        price *= reservation.get().getTotalDate();
+        result.put("price", price.toString());
+        result.put("tax", String.valueOf(price * 0.1));
+        result.put("total", String.valueOf(price + (price * 0.1)));
+        if (reservation.get().getPayment() != null) {
+            result.put("paid", "true");
+        } else
+            result.put("paid", "false");
+        return result;
+    }
+
+    @Override
+    public String bindGuest(String id, List<Guest> guests) {
+        Reservation reservation;
+        if (reservationRepository.findById(id).isPresent()) {
+            reservation = reservationRepository.findById(id).get();
+            reservation.setGuests(new ArrayList<>());
+            for (Guest guest : guests) {
+                reservation.getGuests().add(guest);
+            }
+            reservation.setCustomerEmail(guests.get(0).getEmail());
+            reservationProducerService.sendMail(id, guests.get(0).getEmail());
+            reservationRepository.save(reservation);
+            return "Done";
+        }
+        return null;
+    }
+
+    @Override
+    public List<Guest> getGuests(String id) {
+        List<Guest> guests = new ArrayList<>();
+        List<Guest> guestsInReservation;
+        if (reservationRepository.findById(id).isPresent()) {
+            guestsInReservation = reservationRepository.findById(id).get().getGuests();
+            guests.addAll(guestsInReservation);
+        }
+        return guests;
     }
 
 
