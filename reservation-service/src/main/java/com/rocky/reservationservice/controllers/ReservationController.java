@@ -1,9 +1,6 @@
 package com.rocky.reservationservice.controllers;
 
-import com.rocky.reservationservice.dtos.BookedRoomsRequest;
-import com.rocky.reservationservice.dtos.ChooseRoomRequest;
-import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
-import com.rocky.reservationservice.dtos.RoomState;
+import com.rocky.reservationservice.dtos.*;
 import com.rocky.reservationservice.kafka.ReservationProducerService;
 import com.rocky.reservationservice.models.Guest;
 import com.rocky.reservationservice.services.ReservationService;
@@ -68,4 +65,9 @@ public class ReservationController {
     public ResponseEntity<String> doneChooseRooms(@RequestBody DoneChooseRoomRequest doneChooseRoomRequest) {
         return new ResponseEntity<>(reservationService.handleDoneChoosingRoom(doneChooseRoomRequest), HttpStatus.OK);
     }
+
+    @GetMapping("email/{email}")
+    public ResponseEntity<List<ReservationWrapper>> getReservationWithEmail(@PathVariable String email){
+        return new ResponseEntity<>(reservationService.getReservationWithEmail(email),HttpStatus.OK);
+    };
 }

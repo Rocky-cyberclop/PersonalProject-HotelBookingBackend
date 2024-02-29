@@ -13,6 +13,8 @@ spring:
           uri: lb://IDENTITY-SERVICE
           predicates:
             - Path=/api/auth/**
+          filters:
+            - AuthenticateFilter
 
         - id: reservation-service
           uri: lb://RESERVATION-SERVICE

@@ -1,6 +1,7 @@
 package com.rocky.reservationservice.services.impl;
 
 import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
+import com.rocky.reservationservice.dtos.ReservationWrapper;
 import com.rocky.reservationservice.dtos.RoomState;
 import com.rocky.reservationservice.dtos.RoomWrapper;
 import com.rocky.reservationservice.enums.RoomChosen;
@@ -211,6 +212,23 @@ public class ReservationServiceImpl implements ReservationService {
             guests.addAll(guestsInReservation);
         }
         return guests;
+    }
+
+    @Override
+    public List<ReservationWrapper> getReservationWithEmail(String email) {
+        List<ReservationWrapper> reservationWrappers = new ArrayList<>();
+        List<Reservation> reservations = reservationRepository.findReservationByCustomerEmail(email);
+        if(!reservations.isEmpty()){
+            for(Reservation reservation:reservations){
+                ReservationWrapper reservationWrapper = new ReservationWrapper();
+                reservationWrapper.setId(reservation.get_id());
+                reservationWrapper.setFrom(reservation.getDateCome().toString());
+                reservationWrapper.setTo(reservation.getDateGo().toString());
+                reservationWrapper.setTotalDays(reservation.getTotalDate());
+                reservationWrappers.add(reservationWrapper);
+            }
+        }
+        return reservationWrappers;
     }
 
 

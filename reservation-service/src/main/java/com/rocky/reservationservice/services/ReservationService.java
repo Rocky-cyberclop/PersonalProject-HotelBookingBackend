@@ -1,6 +1,7 @@
 package com.rocky.reservationservice.services;
 
 import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
+import com.rocky.reservationservice.dtos.ReservationWrapper;
 import com.rocky.reservationservice.dtos.RoomState;
 import com.rocky.reservationservice.models.Guest;
 
@@ -27,4 +28,6 @@ public interface ReservationService {
     String bindGuest(String id, List<Guest> guests);
 
     List<Guest> getGuests(String id);
+
+    List<ReservationWrapper> getReservationWithEmail(String email);
 }
