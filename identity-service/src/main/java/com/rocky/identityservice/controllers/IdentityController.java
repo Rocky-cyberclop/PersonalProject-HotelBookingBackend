@@ -1,10 +1,8 @@
 package com.rocky.identityservice.controllers;
 
-import com.rocky.identityservice.dtos.CustomerDto;
-import com.rocky.identityservice.dtos.LoginRequest;
-import com.rocky.identityservice.dtos.RegisterRequest;
-import com.rocky.identityservice.dtos.ReservationWrapper;
+import com.rocky.identityservice.dtos.*;
 import com.rocky.identityservice.feigns.ReservationFeign;
+import com.rocky.identityservice.kafka.IdentityProducerService;
 import com.rocky.identityservice.models.Customer;
 import com.rocky.identityservice.services.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +24,9 @@ public class IdentityController {
 
     @Autowired
     private ReservationFeign reservationFeign;
+
+    @Autowired
+    private IdentityProducerService identityProducerService;
 
     @PostMapping("register")
     public ResponseEntity<RegisterRequest> register(@RequestBody RegisterRequest registerRequest) {
@@ -63,5 +65,40 @@ public class IdentityController {
     @GetMapping("reservation")
     public ResponseEntity<List<ReservationWrapper>> getReservation(@RequestHeader("loggedEmail") String email) {
         return reservationFeign.getReservationWithEmail(email);
+    }
+
+    @GetMapping("forget/sendCode/{email}")
+    public ResponseEntity<String> sendCodeForget(@PathVariable String email) {
+        return new ResponseEntity<>(identityService.sendMaillForgetPass(email), HttpStatus.OK);
+    }
+
+    @GetMapping("forget/doClean")
+    public ResponseEntity<String> cleanForgetCode() {
+        return new ResponseEntity<>(identityProducerService.doCLean(), HttpStatus.OK);
+    }
+
+    @PostMapping("forget/login")
+    public ResponseEntity<String> loginWithCode(@RequestBody Map<String, String> request) {
+        return new ResponseEntity<>(identityService.loginWithCode(
+                request.get("email"), request.get("code")), HttpStatus.OK);
+    }
+
+    @PostMapping("reset")
+    public ResponseEntity<String> resetPass(@RequestHeader("loggedEmail") String email,
+                                            @RequestBody Map<String, String> request) {
+        return new ResponseEntity<>(identityService.resetPassword(email, request.get("password"),
+                request.get("newPassword")), HttpStatus.OK);
+    }
+
+    @GetMapping("comments/{page}")
+    public ResponseEntity<List<CommentDto>> getComment(@PathVariable Integer page) {
+        return new ResponseEntity<>(identityService.getComment(page), HttpStatus.OK);
+    }
+
+    @PostMapping("postComments")
+    public ResponseEntity<String> postComment(@RequestHeader("loggedEmail") String email,
+                                              @RequestBody Map<String, String> content) throws UnsupportedEncodingException {
+        return new ResponseEntity<>(identityService.postComment(
+                email, content.get("content")), HttpStatus.OK);
     }
 }

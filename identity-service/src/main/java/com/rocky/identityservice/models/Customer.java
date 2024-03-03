@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,6 +48,10 @@ public class Customer implements UserDetails, Serializable {
     private String address;
 
     private String nationality;
+
+    private String code;
+
+    private LocalDateTime codeTime;
 
     private Review review;
 

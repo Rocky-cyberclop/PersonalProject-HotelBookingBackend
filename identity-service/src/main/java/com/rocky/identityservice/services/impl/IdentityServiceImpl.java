@@ -1,15 +1,21 @@
 package com.rocky.identityservice.services.impl;
 
+import com.rocky.identityservice.dtos.CommentDto;
 import com.rocky.identityservice.dtos.CustomerDto;
 import com.rocky.identityservice.dtos.LoginRequest;
 import com.rocky.identityservice.dtos.RegisterRequest;
 import com.rocky.identityservice.helpers.Helper;
+import com.rocky.identityservice.kafka.IdentityProducerService;
 import com.rocky.identityservice.models.Customer;
+import com.rocky.identityservice.models.Review;
 import com.rocky.identityservice.repositories.CustomerRepository;
 import com.rocky.identityservice.services.EmailService;
 import com.rocky.identityservice.services.IdentityService;
 import com.rocky.identityservice.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
@@ -17,11 +23,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class IdentityServiceImpl implements IdentityService {
@@ -33,6 +41,9 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private IdentityProducerService identityProducerService;
 
     @Override
     public ResponseEntity<RegisterRequest> register(RegisterRequest registerRequest) {
@@ -116,6 +127,89 @@ public class IdentityServiceImpl implements IdentityService {
         customer.setGender(customerDto.isGender());
         customer.setNationality(customerDto.getNationality());
         customer.setDateOfBirth(LocalDate.parse(customerDto.getDateOfBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX")).plusDays(1));
+        customerRepository.save(customer);
+        return "Done";
+    }
+
+    @Override
+    public String sendMaillForgetPass(String email) {
+        if (!customerRepository.findByEmail(email).isEmpty()) {
+            String code = Helper.random6Numbers(6);
+            identityProducerService.sendMail(email, code);
+            Customer customer = customerRepository.findByEmail(email).get(0);
+            customer.setCode(code);
+            customer.setCodeTime(LocalDateTime.now());
+            customerRepository.save(customer);
+            return "Done!";
+        }
+        return "";
+    }
+
+    @Override
+    public void cleanForgetCode() {
+        List<Customer> customers = customerRepository.findCustomerByCodeNotNull();
+        if (!customers.isEmpty()) {
+            for (Customer customer : customers) {
+                if (Duration.between(customer.getCodeTime(), LocalDateTime.now()).toMinutes() > 5) {
+                    customer.setCode(null);
+                    customer.setCodeTime(null);
+                }
+            }
+            customerRepository.saveAll(customers);
+        }
+    }
+
+    @Override
+    public String loginWithCode(String email, String code) {
+        Customer customer;
+        if (!customerRepository.findByEmail(email).isEmpty()) {
+            customer = customerRepository.findByEmail(email).get(0);
+            if (customer.getCode().equals(code) &&
+                    (Duration.between(customer.getCodeTime(), LocalDateTime.now()).toMinutes() < 5)) {
+                return jwtService.generateToken(customer);
+            }
+            return "";
+        }
+        return "";
+    }
+
+    @Override
+    public String resetPassword(String email, String password, String newPassword) {
+        if (!customerRepository.findByEmail(email).isEmpty()) {
+            Customer customer = customerRepository.findByEmail(email).get(0);
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            if (!bCryptPasswordEncoder.matches(password, customer.getPassword())) {
+                return "Old password not match!";
+            }
+            customer.setPassword(bCryptPasswordEncoder.encode(newPassword));
+            customerRepository.save(customer);
+        }
+        return "Success";
+    }
+
+    @Override
+    public List<CommentDto> getComment(Integer page) {
+        Pageable pageable = PageRequest.of(page - 1, 5);
+        Page<Customer> customers = customerRepository.findAll(pageable);
+        List<CommentDto> commentDtos = new ArrayList<>();
+        for (Customer customer : customers.getContent()) {
+            CommentDto commentDto = new CommentDto();
+            commentDto.setName(customer.getName().isBlank() ? customer.getEmail() : customer.getName());
+            if (customer.getReview() == null) continue;
+            commentDto.setContent(customer.getReview().getComment());
+            commentDtos.add(commentDto);
+        }
+        return commentDtos;
+    }
+
+    @Override
+    public String postComment(String email, String content) throws UnsupportedEncodingException {
+        Customer customer = customerRepository.findByEmail(email).get(0);
+        Review review = new Review();
+        review.setComment(URLDecoder.decode(content, "UTF-8")
+                .replace("\n", " ").replace("\r", " ")
+                .replace("\"", ""));
+        customer.setReview(review);
         customerRepository.save(customer);
         return "Done";
     }

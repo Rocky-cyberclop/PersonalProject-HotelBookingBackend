@@ -1,11 +1,14 @@
 package com.rocky.identityservice.services;
 
+import com.rocky.identityservice.dtos.CommentDto;
 import com.rocky.identityservice.dtos.CustomerDto;
 import com.rocky.identityservice.dtos.LoginRequest;
 import com.rocky.identityservice.dtos.RegisterRequest;
 import com.rocky.identityservice.models.Customer;
 import org.springframework.http.ResponseEntity;
 
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 
 public interface IdentityService {
@@ -22,4 +25,16 @@ public interface IdentityService {
     CustomerDto getInfo(String email);
 
     String updateInfo(CustomerDto customerDto);
+
+    String sendMaillForgetPass(String email);
+
+    void cleanForgetCode();
+
+    String loginWithCode(String email, String code);
+
+    String resetPassword(String email, String password, String newPassword);
+
+    List<CommentDto> getComment(Integer page);
+
+    String postComment(String email, String content) throws UnsupportedEncodingException;
 }
