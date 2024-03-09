@@ -30,4 +30,6 @@ public interface ReservationService {
     List<Guest> getGuests(String id);
 
     List<ReservationWrapper> getReservationWithEmail(String email);
+
+    void updatePayment(String id, String paymentId, String total);
 }

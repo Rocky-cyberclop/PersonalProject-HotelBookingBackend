@@ -14,7 +14,6 @@ import com.rocky.reservationservice.models.Reservation;
 import com.rocky.reservationservice.repositories.ReservationRepository;
 import com.rocky.reservationservice.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -198,7 +197,7 @@ public class ReservationServiceImpl implements ReservationService {
             reservation.setCustomerEmail(guests.get(0).getEmail());
             reservationProducerService.sendMail(id, guests.get(0).getEmail());
             reservationRepository.save(reservation);
-            return "Done";
+            return id;
         }
         return null;
     }
@@ -218,8 +217,8 @@ public class ReservationServiceImpl implements ReservationService {
     public List<ReservationWrapper> getReservationWithEmail(String email) {
         List<ReservationWrapper> reservationWrappers = new ArrayList<>();
         List<Reservation> reservations = reservationRepository.findReservationByCustomerEmail(email);
-        if(!reservations.isEmpty()){
-            for(Reservation reservation:reservations){
+        if (!reservations.isEmpty()) {
+            for (Reservation reservation : reservations) {
                 ReservationWrapper reservationWrapper = new ReservationWrapper();
                 reservationWrapper.setId(reservation.get_id());
                 reservationWrapper.setFrom(reservation.getDateCome().toString());
@@ -229,6 +228,20 @@ public class ReservationServiceImpl implements ReservationService {
             }
         }
         return reservationWrappers;
+    }
+
+    @Override
+    public void updatePayment(String id, String paymentId, String total) {
+        if (reservationRepository.findById(id).isPresent()) {
+            Reservation reservation = reservationRepository.findById(id).get();
+            Payment payment = new Payment();
+            payment.setCode(paymentId);
+            payment.setDate(LocalDate.now());
+            payment.setAmount((long) ((Double.parseDouble(total))));
+            reservation.setPayment(payment);
+            reservationRepository.save(reservation);
+        }
+
     }
 
 

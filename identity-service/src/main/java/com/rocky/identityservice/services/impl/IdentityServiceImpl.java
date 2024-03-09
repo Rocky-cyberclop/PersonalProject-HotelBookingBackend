@@ -209,6 +209,7 @@ public class IdentityServiceImpl implements IdentityService {
         review.setComment(URLDecoder.decode(content, "UTF-8")
                 .replace("\n", " ").replace("\r", " ")
                 .replace("\"", ""));
+        review.setDate(LocalDate.now());
         customer.setReview(review);
         customerRepository.save(customer);
         return "Done";
