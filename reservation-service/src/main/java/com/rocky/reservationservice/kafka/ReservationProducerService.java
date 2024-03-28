@@ -1,6 +1,7 @@
 package com.rocky.reservationservice.kafka;
 
 import com.rocky.reservationservice.dtos.RoomState;
+import com.rocky.reservationservice.enums.RoomChosen;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,9 @@ public class ReservationProducerService {
         toGuest.put("id", id);
         toGuest.put("email", email);
         kafkaTemplate.send("sendMailTopic", toGuest);
+    }
+
+    public void setRoomStateThatDone(RoomState roomState) {
+        kafkaTemplate.send("roomTopic", roomState);
     }
 }

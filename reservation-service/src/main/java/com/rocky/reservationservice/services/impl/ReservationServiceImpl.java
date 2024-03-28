@@ -74,7 +74,9 @@ public class ReservationServiceImpl implements ReservationService {
         for (Reservation reservation : reservations) {
             if ((go.isAfter(reservation.getDateCome()) || go.isEqual(reservation.getDateCome())) && (reservation.getRooms() != null)) {
                 for (RoomWrapper roomWrapper : reservation.getRooms()) {
-                    roomsBooked.add(roomWrapper.getNumber());
+                    if (reservation.getPayment() == null)
+                        roomsBooked.add(roomWrapper.getNumber() * -1);
+                    else roomsBooked.add(roomWrapper.getNumber());
                 }
             }
         }
@@ -97,7 +99,7 @@ public class ReservationServiceImpl implements ReservationService {
                     reservation.getDateGo()));
         }
         RoomWrapper roomWrapperFromFeign = Objects.requireNonNull(roomFeign.getRoom(roomState.getRoom()).getBody());
-        if (roomState.getType().equals(RoomChosen.RESERVE)) {
+        if (roomState.getType().equals(RoomChosen.RESERVING)) {
             if (reservation.getRooms() == null) reservation.setRooms(new ArrayList<>());
             reservation.getRooms().add(roomWrapperFromFeign);
         } else {
@@ -239,6 +241,17 @@ public class ReservationServiceImpl implements ReservationService {
             payment.setDate(LocalDate.now());
             payment.setAmount((long) ((Double.parseDouble(total))));
             reservation.setPayment(payment);
+            for (RoomWrapper roomWrapper : reservation.getRooms()) {
+                RoomState roomState = new RoomState();
+                roomState.setFrom(reservation.getDateCome().atTime(LocalTime.of(17, 0))
+                        .atZone(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX")));
+                roomState.setTo(reservation.getDateGo().atTime(LocalTime.of(17, 0))
+                        .atZone(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX")));
+                roomState.setGuest("notanyguest");
+                roomState.setRoom(roomWrapper.getNumber());
+                roomState.setType(RoomChosen.RESERVE);
+                reservationProducerService.setRoomStateThatDone(roomState);
+            }
             reservationRepository.save(reservation);
         }
 

@@ -93,7 +93,7 @@ public class IdentityServiceImpl implements IdentityService {
         subject += "\nYou can complete your reservation by http://localhost:3000/findReservation";
         subject += "\nAnd fill out with the code above";
         subject += "\nThank for your grateful to us!";
-        emailService.sendEmail(toGuest.get("email"), "Confirm your resercation", subject);
+        emailService.sendEmail(toGuest.get("email"), "Confirm your reservation", subject);
     }
 
     @Override

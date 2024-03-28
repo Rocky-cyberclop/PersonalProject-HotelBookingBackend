@@ -7,6 +7,7 @@ import com.rocky.roomservice.repositories.RoomRepository;
 import com.rocky.roomservice.repositories.RoomTypeRepository;
 import com.rocky.roomservice.services.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ public class RoomServiceImpl implements RoomService {
         Room room;
         List<Picture> pictures;
         Picture picture;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 40; i++) {
             room = new Room();
-            room.setNumber(((i + 1)*100)+4);
-            room.setPrice(700L);
+            room.setNumber(100+i+1);
+            room.setPrice((long) (6 + Math.round(Math.random() * 12)) * 50);
             room.setRoomType(roomTypeRepository.findByName("Extra large room").get(0));
             pictures = new ArrayList<>();
             picture = new Picture();
@@ -47,8 +48,8 @@ public class RoomServiceImpl implements RoomService {
             rooms.add(room);
 
             room = new Room();
-            room.setNumber(((i + 1)*100)+5);
-            room.setPrice(400L);
+            room.setNumber(200+i+1);
+            room.setPrice((long) (5 + Math.round(Math.random() * 10)) * 50);
             room.setRoomType(roomTypeRepository.findByName("Couple room").get(0));
             pictures = new ArrayList<>();
             picture = new Picture();
@@ -64,64 +65,8 @@ public class RoomServiceImpl implements RoomService {
             rooms.add(room);
 
             room = new Room();
-            room.setNumber(((i + 1)*100)+3);
-            room.setPrice(200L);
-            room.setRoomType(roomTypeRepository.findByName("Classic room").get(0));
-            pictures = new ArrayList<>();
-            picture = new Picture();
-            picture.setUrl("single1.jpg");
-            pictures.add(picture);
-            picture = new Picture();
-            picture.setUrl("single2.jpg");
-            pictures.add(picture);
-            room.setPictures(pictures);
-            rooms.add(room);
-
-            room = new Room();
-            room.setNumber(((i + 1)*100)+6);
-            room.setPrice(200L);
-            room.setRoomType(roomTypeRepository.findByName("Classic room").get(0));
-            pictures = new ArrayList<>();
-            picture = new Picture();
-            picture.setUrl("single1.jpg");
-            pictures.add(picture);
-            picture = new Picture();
-            picture.setUrl("single2.jpg");
-            pictures.add(picture);
-            room.setPictures(pictures);
-            rooms.add(room);
-
-            room = new Room();
-            room.setNumber(((i + 1)*100)+2);
-            room.setPrice(250L);
-            room.setRoomType(roomTypeRepository.findByName("Classic room").get(0));
-            pictures = new ArrayList<>();
-            picture = new Picture();
-            picture.setUrl("single1.jpg");
-            pictures.add(picture);
-            picture = new Picture();
-            picture.setUrl("single2.jpg");
-            pictures.add(picture);
-            room.setPictures(pictures);
-            rooms.add(room);
-
-            room = new Room();
-            room.setNumber(((i + 1)*100)+7);
-            room.setPrice(180L);
-            room.setRoomType(roomTypeRepository.findByName("Classic room").get(0));
-            pictures = new ArrayList<>();
-            picture = new Picture();
-            picture.setUrl("single1.jpg");
-            pictures.add(picture);
-            picture = new Picture();
-            picture.setUrl("single2.jpg");
-            pictures.add(picture);
-            room.setPictures(pictures);
-            rooms.add(room);
-
-            room = new Room();
-            room.setNumber(((i + 1)*100)+1);
-            room.setPrice(500L);
+            room.setNumber(300+i+1);
+            room.setPrice((long) (5 + Math.round(Math.random() * 9)) * 50);
             room.setRoomType(roomTypeRepository.findByName("Couple room").get(0));
             pictures = new ArrayList<>();
             picture = new Picture();
@@ -135,28 +80,22 @@ public class RoomServiceImpl implements RoomService {
             pictures.add(picture);
             room.setPictures(pictures);
             rooms.add(room);
+
+            room = new Room();
+            room.setNumber(400+i+1);
+            room.setPrice((long) (2 + Math.round(Math.random() * 9)) * 50);
+            room.setRoomType(roomTypeRepository.findByName("Classic room").get(0));
+            pictures = new ArrayList<>();
+            picture = new Picture();
+            picture.setUrl("single1.jpg");
+            pictures.add(picture);
+            picture = new Picture();
+            picture.setUrl("single2.jpg");
+            pictures.add(picture);
+            room.setPictures(pictures);
+            rooms.add(room);
+
         }
-        room = new Room();
-        room.setNumber(408);
-        room.setPrice(300L);
-        room.setRoomType(roomTypeRepository.findByName("Small conference room").get(0));
-        pictures = new ArrayList<>();
-        picture = new Picture();
-        picture.setUrl("small-conference.jpg");
-        pictures.add(picture);
-        room.setPictures(pictures);
-        rooms.add(room);
-
-        room = new Room();
-        room.setNumber(409);
-        room.setPrice(500L);
-        room.setRoomType(roomTypeRepository.findByName("Large conference room").get(0));
-        pictures = new ArrayList<>();
-        picture = new Picture();
-        picture.setUrl("large-conference.jpg");
-        pictures.add(picture);
-        room.setPictures(pictures);
-        rooms.add(room);
 
         roomRepository.saveAll(rooms);
     }
