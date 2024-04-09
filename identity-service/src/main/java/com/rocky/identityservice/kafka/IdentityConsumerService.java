@@ -28,6 +28,13 @@ public class IdentityConsumerService {
         emailService.sendEmail(customer.get("email"), "Login code", subject);
     }
 
+    @KafkaListener(topics = "sendMailRandomPasswordTopic", groupId = "identityGroup")
+    public void consumeSendMailRandomPassword(Map<String, String> customer) {
+        String subject = "This is your new password:" + customer.get("password");
+        subject += "\nDo not share this password to anyone!";
+        emailService.sendEmail(customer.get("email"), "Password recovery", subject);
+    }
+
     @KafkaListener(topics = "cleanForgetCodeTopic", groupId = "identityGroup")
     public void consumeCleanForgetCodeClean(Integer a) {
         identityService.cleanForgetCode();

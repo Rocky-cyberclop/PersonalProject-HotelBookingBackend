@@ -3,12 +3,10 @@ package com.rocky.identityservice.controllers;
 import com.rocky.identityservice.dtos.*;
 import com.rocky.identityservice.feigns.ReservationFeign;
 import com.rocky.identityservice.kafka.IdentityProducerService;
-import com.rocky.identityservice.models.Customer;
 import com.rocky.identityservice.services.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -77,9 +75,9 @@ public class IdentityController {
         return new ResponseEntity<>(identityProducerService.doCLean(), HttpStatus.OK);
     }
 
-    @PostMapping("forget/login")
+    @PostMapping("forget/authCode")
     public ResponseEntity<String> loginWithCode(@RequestBody Map<String, String> request) {
-        return new ResponseEntity<>(identityService.loginWithCode(
+        return new ResponseEntity<>(identityService.generateNewPassword(
                 request.get("email"), request.get("code")), HttpStatus.OK);
     }
 

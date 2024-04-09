@@ -67,13 +67,11 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public String login(LoginRequest loginRequest) {
         if (customerRepository.findByEmail(loginRequest.getEmail()).isEmpty()) {
-//            System.out.println("No email found");
             return "No email found";
         }
         Customer customer = customerRepository.findByEmail(loginRequest.getEmail()).get(0);
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) {
-//            System.out.println("Pass not match");
             return "Pass not match";
         }
         return jwtService.generateToken(customer);
@@ -160,12 +158,17 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public String loginWithCode(String email, String code) {
+    public String generateNewPassword(String email, String code) {
         Customer customer;
         if (!customerRepository.findByEmail(email).isEmpty()) {
             customer = customerRepository.findByEmail(email).get(0);
             if (customer.getCode().equals(code) &&
                     (Duration.between(customer.getCodeTime(), LocalDateTime.now()).toMinutes() < 5)) {
+                String newRandomPassword = Helper.randomString(8);
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                customer.setPassword(bCryptPasswordEncoder.encode(newRandomPassword));
+                identityProducerService.sendPassword(email, newRandomPassword);
+                customerRepository.save(customer);
                 return jwtService.generateToken(customer);
             }
             return "";

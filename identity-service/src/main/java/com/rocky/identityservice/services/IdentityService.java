@@ -4,7 +4,6 @@ import com.rocky.identityservice.dtos.CommentDto;
 import com.rocky.identityservice.dtos.CustomerDto;
 import com.rocky.identityservice.dtos.LoginRequest;
 import com.rocky.identityservice.dtos.RegisterRequest;
-import com.rocky.identityservice.models.Customer;
 import org.springframework.http.ResponseEntity;
 
 import java.io.UnsupportedEncodingException;
@@ -30,7 +29,7 @@ public interface IdentityService {
 
     void cleanForgetCode();
 
-    String loginWithCode(String email, String code);
+    String generateNewPassword(String email, String code);
 
     String resetPassword(String email, String password, String newPassword);
 

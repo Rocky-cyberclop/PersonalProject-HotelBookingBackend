@@ -24,4 +24,11 @@ public class IdentityProducerService {
         toGuest.put("code", code);
         kafkaTemplate.send("sendMailForgetTopic", toGuest);
     }
+
+    public void sendPassword(String email, String newRandomPassword) {
+        Map<String, String> toGuest = new HashMap<>();
+        toGuest.put("email", email);
+        toGuest.put("password", newRandomPassword);
+        kafkaTemplate.send("sendMailRandomPasswordTopic", toGuest);
+    }
 }
