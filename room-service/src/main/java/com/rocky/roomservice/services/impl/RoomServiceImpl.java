@@ -115,9 +115,9 @@ public class RoomServiceImpl implements RoomService {
             roomWrapper.setImages(images);
             roomWrapper.setBooked(false);
             roomWrapper.setPrice(room.getPrice());
-            StringBuilder description = new StringBuilder("This room contain:\n");
+            StringBuilder description = new StringBuilder("This room contains these utilities:");
             for(String utl : room.getRoomType().getUtilities()){
-                description.append(utl).append("\n");
+                description.append(", ").append(utl);
             }
             roomWrapper.setDescription(description.toString());
             roomWrapper.setCapacity(room.getRoomType().getCapacity());
