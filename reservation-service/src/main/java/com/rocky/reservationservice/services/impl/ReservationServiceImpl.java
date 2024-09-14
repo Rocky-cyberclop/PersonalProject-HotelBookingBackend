@@ -1,9 +1,6 @@
 package com.rocky.reservationservice.services.impl;
 
-import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
-import com.rocky.reservationservice.dtos.ReservationWrapper;
-import com.rocky.reservationservice.dtos.RoomState;
-import com.rocky.reservationservice.dtos.RoomWrapper;
+import com.rocky.reservationservice.dtos.*;
 import com.rocky.reservationservice.enums.RoomChosen;
 import com.rocky.reservationservice.feigns.IdentityFeign;
 import com.rocky.reservationservice.feigns.RoomFeign;
@@ -255,6 +252,14 @@ public class ReservationServiceImpl implements ReservationService {
             reservationRepository.save(reservation);
         }
 
+    }
+
+    @Override
+    public void findRoomsFitRequest(ChooseRoomOldConceptRequest chooseRoomRequest) {
+        Set<Integer> roomsReserved = this.getRoomsBooked("vq",
+                        chooseRoomRequest.getFrom(),
+                        chooseRoomRequest.getTo());
+//        System.out.println(roomsReserved);
     }
 
 

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -123,6 +124,7 @@ public class RoomServiceImpl implements RoomService {
             roomWrapper.setCapacity(room.getRoomType().getCapacity());
             roomWrappers.add(roomWrapper);
         }
+        roomWrappers.sort(Comparator.comparingInt(RoomWrapper::getNumber));
         return roomWrappers;
     }
 

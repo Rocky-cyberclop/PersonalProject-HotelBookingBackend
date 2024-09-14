@@ -174,4 +174,10 @@ public class ReservationController {
 
         return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
     }
+
+    @PostMapping("chooseRoomOldConcept")
+    public ResponseEntity<String> chooseRoomOldConcept(@RequestBody ChooseRoomOldConceptRequest chooseRoomRequest) {
+        this.reservationService.findRoomsFitRequest(chooseRoomRequest);
+        return new ResponseEntity<>("OK", HttpStatus.OK);
+    }
 }
