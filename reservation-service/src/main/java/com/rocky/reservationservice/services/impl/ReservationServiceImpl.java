@@ -255,11 +255,17 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void findRoomsFitRequest(ChooseRoomOldConceptRequest chooseRoomRequest) {
+    public SuggestRoomsResponse findRoomsFitRequest(ChooseRoomOldConceptRequest chooseRoomRequest) {
         Set<Integer> roomsReserved = this.getRoomsBooked("vq",
                         chooseRoomRequest.getFrom(),
                         chooseRoomRequest.getTo());
-//        System.out.println(roomsReserved);
+        Integer[] excepts = roomsReserved.toArray(Integer[]::new);
+        ChooseRoomOldConceptRequestForRoomService request = new ChooseRoomOldConceptRequestForRoomService();
+        request.setNumberOfRoom(chooseRoomRequest.getNumberOfRoom());
+        request.setExcepts(excepts);
+        request.setPage(chooseRoomRequest.getPage());
+        request.setFilter(Arrays.stream(chooseRoomRequest.getFilter()).toList());
+        return this.roomFeign.getSuggetsRooms(request).getBody();
     }
 
 

@@ -1,9 +1,6 @@
 package com.rocky.reservationservice.services;
 
-import com.rocky.reservationservice.dtos.ChooseRoomOldConceptRequest;
-import com.rocky.reservationservice.dtos.DoneChooseRoomRequest;
-import com.rocky.reservationservice.dtos.ReservationWrapper;
-import com.rocky.reservationservice.dtos.RoomState;
+import com.rocky.reservationservice.dtos.*;
 import com.rocky.reservationservice.models.Guest;
 
 import java.time.LocalDate;
@@ -34,5 +31,5 @@ public interface ReservationService {
 
     void updatePayment(String id, String paymentId, String total);
 
-    void findRoomsFitRequest(ChooseRoomOldConceptRequest chooseRoomRequest);
+    SuggestRoomsResponse findRoomsFitRequest(ChooseRoomOldConceptRequest chooseRoomRequest);
 }

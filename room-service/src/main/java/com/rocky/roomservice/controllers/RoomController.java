@@ -1,18 +1,19 @@
 package com.rocky.roomservice.controllers;
 
+import com.rocky.roomservice.dtos.ChooseRoomOldConceptRequest;
 import com.rocky.roomservice.dtos.RoomWrapper;
+import com.rocky.roomservice.dtos.SuggestRoomsResponse;
+import com.rocky.roomservice.models.Room;
 import com.rocky.roomservice.services.RoomService;
 import com.rocky.roomservice.services.RoomTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,5 +65,10 @@ public class RoomController {
     @GetMapping("{number}")
     public ResponseEntity<RoomWrapper> getRoom(@PathVariable Integer number){
         return new ResponseEntity<>(roomService.getByNumber(number), HttpStatus.OK);
+    }
+
+    @PostMapping("suggest")
+    public ResponseEntity<SuggestRoomsResponse> getSuggestRooms(@RequestBody ChooseRoomOldConceptRequest filter){
+        return new ResponseEntity<>(roomService.getSuggestRooms(filter), HttpStatus.OK);
     }
 }
