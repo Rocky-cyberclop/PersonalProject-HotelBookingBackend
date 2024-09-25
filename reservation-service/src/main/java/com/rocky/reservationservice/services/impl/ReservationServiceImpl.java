@@ -17,6 +17,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -258,7 +259,7 @@ public class ReservationServiceImpl implements ReservationService {
     public SuggestRoomsResponse findRoomsFitRequest(ChooseRoomOldConceptRequest chooseRoomRequest) {
         Set<Integer> roomsReserved = this.getRoomsBooked("vq",
                         chooseRoomRequest.getFrom(),
-                        chooseRoomRequest.getTo());
+                        chooseRoomRequest.getTo()).stream().map(Math::abs).collect(Collectors.toSet());
         Integer[] excepts = roomsReserved.toArray(Integer[]::new);
         ChooseRoomOldConceptRequestForRoomService request = new ChooseRoomOldConceptRequestForRoomService();
         request.setNumberOfRoom(chooseRoomRequest.getNumberOfRoom());
