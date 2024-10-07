@@ -15,8 +15,7 @@ public class RouteValidator {
             "/api/auth/forget",
             "/api/auth/comments",
             "/api/reservation",
-            "/api/room",
-            "/api/room/assets/images",
+            "/api/room/public",
             "eureka"
     );
 

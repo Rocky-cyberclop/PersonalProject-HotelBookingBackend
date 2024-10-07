@@ -32,13 +32,13 @@ public class RoomController {
     }
 
 //    This function shall be used one time
-    @GetMapping("createRoom")
+    @GetMapping("public/createRoom")
     public ResponseEntity<String> createRoom(){
         roomService.createRoom();
         return new ResponseEntity<>("Created", HttpStatus.OK);
     }
 
-    @GetMapping("assets/images/{name}")
+    @GetMapping("public/assets/images/{name}")
     public ResponseEntity<byte[]> getImage(@PathVariable String name) {
         ClassPathResource imgFile = new ClassPathResource("static/assets/images/" + name);
         byte[] imageData;
@@ -57,7 +57,7 @@ public class RoomController {
         return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
     }
 
-    @GetMapping("floor/{number}")
+    @GetMapping("public/floor/{number}")
     public ResponseEntity<List<RoomWrapper>> getRoomInFloor(@PathVariable("number") Integer floor){
         return new ResponseEntity<>(roomService.getRoomsByFloor(floor), HttpStatus.OK);
     }
