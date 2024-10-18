@@ -11,6 +11,9 @@ import com.rocky.reservationservice.models.Reservation;
 import com.rocky.reservationservice.repositories.ReservationRepository;
 import com.rocky.reservationservice.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -269,5 +272,24 @@ public class ReservationServiceImpl implements ReservationService {
         return this.roomFeign.getSuggetsRooms(request).getBody();
     }
 
+    @Override
+    public ReservationsResponse findAllReservation(ReservationsRequest request){
+        Pageable pageable = PageRequest.of(request.getPage()-1, request.getSize());
+        Page<Reservation> reservations = this.reservationRepository.findReservationsByDateComeBetweenOrDateGoBetween(
+                LocalDate.parse(request.getFrom(), DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                LocalDate.parse(request.getTo(), DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                LocalDate.parse(request.getFrom(), DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                LocalDate.parse(request.getTo(), DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                pageable);
+        ReservationsResponse response = new ReservationsResponse();
+        response.setReservations(reservations.getContent());
+        response.setTotalPage(reservations.getTotalPages());
+        return response;
+    }
+
+    @Override
+    public  Reservation findOne(String id){
+        return this.reservationRepository.findById(id).get();
+    }
 
 }

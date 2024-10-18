@@ -2,6 +2,7 @@ package com.rocky.reservationservice.services;
 
 import com.rocky.reservationservice.dtos.*;
 import com.rocky.reservationservice.models.Guest;
+import com.rocky.reservationservice.models.Reservation;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,4 +33,8 @@ public interface ReservationService {
     void updatePayment(String id, String paymentId, String total);
 
     SuggestRoomsResponse findRoomsFitRequest(ChooseRoomOldConceptRequest chooseRoomRequest);
+
+    ReservationsResponse findAllReservation(ReservationsRequest request);
+
+    Reservation findOne(String id);
 }

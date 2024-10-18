@@ -3,6 +3,7 @@ package com.rocky.reservationservice.controllers;
 import com.rocky.reservationservice.dtos.*;
 import com.rocky.reservationservice.kafka.ReservationProducerService;
 import com.rocky.reservationservice.models.Guest;
+import com.rocky.reservationservice.models.Reservation;
 import com.rocky.reservationservice.services.ReservationService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,5 +179,15 @@ public class ReservationController {
     @PostMapping("chooseRoomOldConcept")
     public ResponseEntity<SuggestRoomsResponse> chooseRoomOldConcept(@RequestBody ChooseRoomOldConceptRequest chooseRoomRequest) {
         return new ResponseEntity<>(this.reservationService.findRoomsFitRequest(chooseRoomRequest), HttpStatus.OK);
+    }
+
+    @PostMapping("all")
+    public ResponseEntity<ReservationsResponse> findAllReservations(@RequestBody ReservationsRequest request) {
+        return new ResponseEntity<>(this.reservationService.findAllReservation(request), HttpStatus.OK);
+    }
+
+    @GetMapping("one/{id}")
+    public ResponseEntity<Reservation> findOneReservation(@PathVariable String id) {
+        return new ResponseEntity<>(this.reservationService.findOne(id), HttpStatus.OK);
     }
 }

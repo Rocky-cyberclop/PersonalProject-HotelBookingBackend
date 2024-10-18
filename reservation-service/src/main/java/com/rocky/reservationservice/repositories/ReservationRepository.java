@@ -20,4 +20,6 @@ public interface ReservationRepository extends MongoRepository<Reservation, Stri
 
     List<Reservation> findReservationByCustomerEmail(String email);
 
+    Page<Reservation> findReservationsByDateComeBetweenOrDateGoBetween(LocalDate from, LocalDate to,LocalDate start, LocalDate end, Pageable pageable);
+
 }
