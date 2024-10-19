@@ -1,9 +1,7 @@
 package com.rocky.identityservice.services;
 
-import com.rocky.identityservice.dtos.CommentDto;
-import com.rocky.identityservice.dtos.CustomerDto;
-import com.rocky.identityservice.dtos.LoginRequest;
-import com.rocky.identityservice.dtos.RegisterRequest;
+import com.rocky.identityservice.dtos.*;
+import com.rocky.identityservice.models.Customer;
 import org.springframework.http.ResponseEntity;
 
 import java.io.UnsupportedEncodingException;
@@ -36,4 +34,8 @@ public interface IdentityService {
     List<CommentDto> getComment(Integer page);
 
     String postComment(String email, String content) throws UnsupportedEncodingException;
+
+    UsersResponse findAll(UsersRequest request);
+
+    Customer findOne(String id);
 }

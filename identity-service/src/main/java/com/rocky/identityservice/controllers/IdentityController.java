@@ -3,6 +3,7 @@ package com.rocky.identityservice.controllers;
 import com.rocky.identityservice.dtos.*;
 import com.rocky.identityservice.feigns.ReservationFeign;
 import com.rocky.identityservice.kafka.IdentityProducerService;
+import com.rocky.identityservice.models.Customer;
 import com.rocky.identityservice.services.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -98,5 +99,15 @@ public class IdentityController {
                                               @RequestBody Map<String, String> content) throws UnsupportedEncodingException {
         return new ResponseEntity<>(identityService.postComment(
                 email, content.get("content")), HttpStatus.OK);
+    }
+
+    @PostMapping("all")
+    public ResponseEntity<UsersResponse> getAllUsers(@RequestBody UsersRequest request) {
+        return new ResponseEntity<>(identityService.findAll(request), HttpStatus.OK);
+    }
+
+    @GetMapping("one/{id}")
+    public ResponseEntity<Customer> getOne(@PathVariable String id) {
+        return new ResponseEntity<>(identityService.findOne(id), HttpStatus.OK);
     }
 }

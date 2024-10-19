@@ -1,9 +1,6 @@
 package com.rocky.identityservice.services.impl;
 
-import com.rocky.identityservice.dtos.CommentDto;
-import com.rocky.identityservice.dtos.CustomerDto;
-import com.rocky.identityservice.dtos.LoginRequest;
-import com.rocky.identityservice.dtos.RegisterRequest;
+import com.rocky.identityservice.dtos.*;
 import com.rocky.identityservice.helpers.Helper;
 import com.rocky.identityservice.kafka.IdentityProducerService;
 import com.rocky.identityservice.models.Customer;
@@ -216,5 +213,26 @@ public class IdentityServiceImpl implements IdentityService {
         customer.setReview(review);
         customerRepository.save(customer);
         return "Done";
+    }
+
+    @Override
+    public UsersResponse findAll(UsersRequest request){
+        Pageable pageable = PageRequest.of(request.getPage()-1, request.getSize());
+        Page<Customer> customers = this.customerRepository.findCustomersByNameIsLikeOrPhoneIsLikeOrEmailIsLikeAndEmailIsNot(
+                request.getText(),
+                request.getText(),
+                request.getText(),
+                "admin",
+                pageable
+        );
+        UsersResponse response = new UsersResponse();
+        response.setTotalPage(customers.getTotalPages());
+        response.setUsers(customers.getContent());
+        return response;
+    }
+
+    @Override
+    public Customer findOne(String id){
+        return this.customerRepository.findById(id).get();
     }
 }

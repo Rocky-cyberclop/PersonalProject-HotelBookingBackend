@@ -28,7 +28,7 @@ import java.util.List;
 @Builder
 public class Customer implements UserDetails, Serializable {
     @Id
-    private ObjectId _id;
+    private String _id;
 
     private String name;
 
