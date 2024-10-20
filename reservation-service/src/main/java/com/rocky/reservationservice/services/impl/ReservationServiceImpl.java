@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -32,6 +35,8 @@ public class ReservationServiceImpl implements ReservationService {
     private RoomFeign roomFeign;
     @Autowired
     private ReservationProducerService reservationProducerService;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public String chooseRoom(String from, String to) {
@@ -290,6 +295,45 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public  Reservation findOne(String id){
         return this.reservationRepository.findById(id).get();
+    }
+
+    @Override
+    public List<PaymentSummary> statisticProfit(ReservationsRequest request){
+        MatchOperation matchStage = Aggregation.match(
+                Criteria.where("payment.date")
+                        .gte(LocalDate.parse(request.getFrom(), DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .lte(LocalDate.parse(request.getTo(), DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+        );
+
+        GroupOperation groupStage = Aggregation.group("payment.date")
+                .first("payment.date").as("label")
+                .sum("payment.amount").as("value");
+
+        Aggregation aggregation = Aggregation.newAggregation(matchStage, groupStage);
+        AggregationResults<PaymentSummary> results = mongoTemplate.aggregate(aggregation, "reservation", PaymentSummary.class);
+        return results.getMappedResults();
+    }
+
+    @Override
+    public List<PaymentSummary> statisticReservation(ReservationsRequest request){
+        MatchOperation matchStage = Aggregation.match(
+                Criteria.where("createdAt")
+                        .gte(LocalDate.parse(request.getFrom(), DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .lte(LocalDate.parse(request.getTo(), DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+        );
+
+        ProjectionOperation projectStage = Aggregation.project()
+                .andExpression("dateToString('%Y-%m-%d', createdAt)").as("createdDate");
+
+        GroupOperation groupStage = Aggregation.group("createdDate")
+                .first("createdDate").as("label")
+                .count().as("value");
+
+        Aggregation aggregation = Aggregation.newAggregation(matchStage, projectStage, groupStage);
+
+        AggregationResults<PaymentSummary> results = mongoTemplate.aggregate(aggregation, "reservation", PaymentSummary.class);
+        return results.getMappedResults();
+
     }
 
 }

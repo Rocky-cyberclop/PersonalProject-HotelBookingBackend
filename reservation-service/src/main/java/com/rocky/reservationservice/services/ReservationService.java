@@ -37,4 +37,8 @@ public interface ReservationService {
     ReservationsResponse findAllReservation(ReservationsRequest request);
 
     Reservation findOne(String id);
+
+    List<PaymentSummary> statisticProfit(ReservationsRequest request);
+
+    List<PaymentSummary> statisticReservation(ReservationsRequest request);
 }

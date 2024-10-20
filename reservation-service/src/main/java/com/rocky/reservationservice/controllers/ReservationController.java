@@ -190,4 +190,14 @@ public class ReservationController {
     public ResponseEntity<Reservation> findOneReservation(@PathVariable String id) {
         return new ResponseEntity<>(this.reservationService.findOne(id), HttpStatus.OK);
     }
+
+    @PostMapping("statistic/profit")
+    public ResponseEntity<List<PaymentSummary>> statisticProfit(@RequestBody ReservationsRequest request) {
+        return new ResponseEntity<>(this.reservationService.statisticProfit(request), HttpStatus.OK);
+    }
+
+    @PostMapping("statistic/reservation")
+    public ResponseEntity<List<PaymentSummary>> statisticReservation(@RequestBody ReservationsRequest request) {
+        return new ResponseEntity<>(this.reservationService.statisticReservation(request), HttpStatus.OK);
+    }
 }

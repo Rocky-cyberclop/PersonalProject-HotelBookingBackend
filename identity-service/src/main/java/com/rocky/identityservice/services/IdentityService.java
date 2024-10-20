@@ -38,4 +38,6 @@ public interface IdentityService {
     UsersResponse findAll(UsersRequest request);
 
     Customer findOne(String id);
+
+    String adminResetPass(String id);
 }

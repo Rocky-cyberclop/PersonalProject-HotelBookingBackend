@@ -110,4 +110,9 @@ public class IdentityController {
     public ResponseEntity<Customer> getOne(@PathVariable String id) {
         return new ResponseEntity<>(identityService.findOne(id), HttpStatus.OK);
     }
+
+    @GetMapping("admin/reset/pass/{id}")
+    public ResponseEntity<String> adminResetPass(@PathVariable String id) {
+        return new ResponseEntity<>(identityService.adminResetPass(id), HttpStatus.OK);
+    }
 }

@@ -235,4 +235,15 @@ public class IdentityServiceImpl implements IdentityService {
     public Customer findOne(String id){
         return this.customerRepository.findById(id).get();
     }
+
+    @Override
+    public String adminResetPass(String id){
+        Customer customer = this.customerRepository.findById(id).get();
+        String newRandomPassword = Helper.randomString(8);
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        customer.setPassword(bCryptPasswordEncoder.encode(newRandomPassword));
+        identityProducerService.sendPassword(customer.getEmail(), newRandomPassword);
+        customerRepository.save(customer);
+        return "Done";
+    }
 }
