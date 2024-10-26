@@ -200,7 +200,12 @@ public class RoomServiceImpl implements RoomService {
         }
         Pageable page = PageRequest.of(filter.getPage(), filter.getNumberOfRoom());
         Page<Room> res = this.roomRepository.findRoomByRoomType_NameInAndCapacityInAndUtilitiesInAndNumberNotIn(
-                types,capacities,utilities, Arrays.stream(filter.getExcepts()).toList(),page
+                types,
+                capacities,
+                utilities,
+                Arrays.stream(filter.getExcepts()).toList(),
+                filter.getPrice(),
+                page
         );
         List <RoomWrapper> roomWrappers = new ArrayList<>();
         for(Room room : res.getContent()){

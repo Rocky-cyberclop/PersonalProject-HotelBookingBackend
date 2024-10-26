@@ -194,7 +194,11 @@ public class IdentityServiceImpl implements IdentityService {
         List<CommentDto> commentDtos = new ArrayList<>();
         for (Customer customer : customers.getContent()) {
             CommentDto commentDto = new CommentDto();
-            commentDto.setName(customer.getName().isBlank() ? customer.getEmail() : customer.getName());
+            try{
+                commentDto.setName(customer.getName().isBlank() ? customer.getEmail() : customer.getName());
+            }catch (NullPointerException e){
+                continue;
+            }
             if (customer.getReview() == null) continue;
             commentDto.setContent(customer.getReview().getComment());
             commentDtos.add(commentDto);

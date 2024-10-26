@@ -15,7 +15,18 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     List<Room> findRoomByNumber(Integer number);
 
-    @Query("{'roomType.name': { $in: ?0 }, 'roomType.capacity': { $in: ?1 }, 'roomType.utilities': { $in: ?2 }, 'number': { $nin: ?3 }}")
+    @Query("{" +
+            "'roomType.name': { $in: ?0 }, " +
+            "'roomType.capacity': { $in: ?1 }, " +
+            "'roomType.utilities': { $in: ?2 }, " +
+            "'number': { $nin: ?3 }," +
+            "'price': { $lte: ?4 }" +
+            "}")
     Page<Room> findRoomByRoomType_NameInAndCapacityInAndUtilitiesInAndNumberNotIn(
-            List<String> names, List<Integer> capacities, List<String> utilities, List<Integer> numbers, Pageable pageable);
+            List<String> names,
+            List<Integer> capacities,
+            List<String> utilities,
+            List<Integer> numbers,
+            Integer price,
+            Pageable pageable);
 }

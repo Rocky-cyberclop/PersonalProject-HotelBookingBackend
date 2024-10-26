@@ -274,6 +274,7 @@ public class ReservationServiceImpl implements ReservationService {
         request.setExcepts(excepts);
         request.setPage(chooseRoomRequest.getPage());
         request.setFilter(Arrays.stream(chooseRoomRequest.getFilter()).toList());
+        request.setPrice(chooseRoomRequest.getPrice());
         return this.roomFeign.getSuggetsRooms(request).getBody();
     }
 

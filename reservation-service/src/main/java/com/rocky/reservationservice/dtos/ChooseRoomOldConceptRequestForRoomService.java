@@ -15,4 +15,6 @@ public class ChooseRoomOldConceptRequestForRoomService {
     private Integer page;
     private List<Integer> filter;
     private Integer numberOfRoom;
+    private Integer price;
+
 }
