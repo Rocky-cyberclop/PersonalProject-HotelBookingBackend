@@ -19,4 +19,5 @@ public class ChooseRoomOldConceptRequest {
     private Integer children;
     private Integer numberOfRoom;
     private Integer price;
+    private Integer[] selectedRooms;
 }

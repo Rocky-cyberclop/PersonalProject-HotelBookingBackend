@@ -271,7 +271,9 @@ public class ReservationServiceImpl implements ReservationService {
         Integer[] excepts = roomsReserved.toArray(Integer[]::new);
         ChooseRoomOldConceptRequestForRoomService request = new ChooseRoomOldConceptRequestForRoomService();
         request.setNumberOfRoom(chooseRoomRequest.getNumberOfRoom());
-        request.setExcepts(excepts);
+        request.setExcepts(Arrays.stream(excepts)
+                .filter(e -> !Arrays.asList(chooseRoomRequest.getSelectedRooms()).contains(e))
+                .toArray(Integer[]::new));
         request.setPage(chooseRoomRequest.getPage());
         request.setFilter(Arrays.stream(chooseRoomRequest.getFilter()).toList());
         request.setPrice(chooseRoomRequest.getPrice());
